@@ -15,26 +15,8 @@
 
 TODO: This code needs a serious security review!!!
 """
-from zope.security.untrustedpython.builtins import SafeBuiltins
-from zope.security.untrustedpython.rcompile import compile
-import warnings
-
-class RestrictedInterpreter(object):
-
-    def __init__(self):
-        warnings.warn("RestrictedInterpreter was deprecated 2004/7/27",
-                      DeprecationWarning, 2)
-        self.globals = {}
-        self.locals = {}
-
-    def ri_exec(self, code):
-        """Execute Python code in a restricted environment.
-
-        The value of code can be either source or binary code."""
-        if isinstance(code, basestring):
-            code = compile(code, '<string>', 'exec')
-        self.globals['__builtins__'] = SafeBuiltins
-        exec code in self.globals, self.locals
+from zope.untrustedpython.builtins import SafeBuiltins
+from zope.untrustedpython.rcompile import compile
 
 def exec_code(code, globals, locals=None):
     globals['__builtins__'] = SafeBuiltins
@@ -44,8 +26,8 @@ def exec_src(source, globals, locals=None):
     globals['__builtins__'] = SafeBuiltins
     code = compile(source, '<string>', 'exec')
     exec code in globals, locals
-    
-    
+
+
 class CompiledExpression(object):
     """A compiled expression
     """
@@ -59,8 +41,8 @@ class CompiledExpression(object):
         if locals is None:
             return eval(self.code, globals)
         else:
-            return eval(self.code, globals)
-    
+            return eval(self.code, globals, locals)
+
 class CompiledProgram(object):
     """A compiled expression
     """

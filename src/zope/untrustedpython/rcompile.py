@@ -19,7 +19,7 @@ Only 'eval' is supported at this time.
 import compiler.pycodegen
 
 import RestrictedPython.RCompile
-from RestrictedPython.SelectCompiler import ast, OP_ASSIGN, OP_DELETE, OP_APPLY
+from RestrictedPython.SelectCompiler import ast
 
 def compile(text, filename, mode):
     if not isinstance(text, basestring):

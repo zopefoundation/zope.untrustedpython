@@ -19,8 +19,7 @@
 """Setup for zope.security package
 """
 import os
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 def read(*rnames):
@@ -43,6 +42,10 @@ setup(name='zope.untrustedpython',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: Zope Public License',
           'Programming Language :: Python',
+          'Programming Language :: Python :: 2',
+          'Programming Language :: Python :: 2.6',
+          'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: Implementation :: CPython',
           'Natural Language :: English',
           'Operating System :: OS Independent',
           'Topic :: Internet :: WWW/HTTP',
@@ -52,10 +55,12 @@ setup(name='zope.untrustedpython',
       packages=find_packages('src'),
       package_dir = {'': 'src'},
       namespace_packages=['zope'],
-      install_requires=['RestrictedPython',
-                        'zope.security',
-                        ],
-      test_suite = 'zope.untrustedpython',
+      install_requires=[
+          'setuptools',
+          'RestrictedPython',
+          'zope.security',
+          ],
+      test_suite = 'zope.untrustedpython.tests.test_suite',
       include_package_data = True,
       zip_safe = True,
       )
