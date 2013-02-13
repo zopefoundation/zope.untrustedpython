@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-4.0.0 (unreleased)
+4.0.0 (2013-02-12)
 ------------------
 
 - Test coverage at 100%.

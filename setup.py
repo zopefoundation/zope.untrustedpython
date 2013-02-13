@@ -26,7 +26,7 @@ def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 setup(name='zope.untrustedpython',
-      version='4.0.0dev',
+      version='4.0.0',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
       description='Zope Untrusted Python Library',
