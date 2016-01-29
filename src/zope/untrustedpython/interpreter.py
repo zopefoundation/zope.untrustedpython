@@ -18,14 +18,16 @@ TODO: This code needs a serious security review!!!
 from zope.untrustedpython.builtins import SafeBuiltins
 from zope.untrustedpython.rcompile import compile
 
+
 def exec_code(code, globals, locals=None):
     globals['__builtins__'] = SafeBuiltins
-    exec code in globals, locals
+    exec(code, globals, locals)
+
 
 def exec_src(source, globals, locals=None):
     globals['__builtins__'] = SafeBuiltins
     code = compile(source, '<string>', 'exec')
-    exec code in globals, locals
+    exec(code, globals, locals)
 
 
 class CompiledExpression(object):
@@ -43,6 +45,7 @@ class CompiledExpression(object):
         else:
             return eval(self.code, globals, locals)
 
+
 class CompiledProgram(object):
     """A compiled expression
     """
@@ -55,4 +58,4 @@ class CompiledProgram(object):
         globals['__builtins__'] = SafeBuiltins
         if output is not None:
             globals['untrusted_output'] = output
-        exec self.code in globals, locals
+        exec(self.code, globals, locals)

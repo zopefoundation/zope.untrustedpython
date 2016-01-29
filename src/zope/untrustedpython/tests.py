@@ -13,16 +13,19 @@
 ##############################################################################
 """Tests for zope.security.checker
 """
-import unittest
-from zope.untrustedpython import interpreter, rcompile
+
+from zope.untrustedpython import interpreter
+from zope.untrustedpython import rcompile
 from zope.untrustedpython.builtins import SafeBuiltins
+
+import unittest
 
 
 class Test_SafeBuiltins(unittest.TestCase):
 
     def test_simple(self):
         d = {'__builtins__': SafeBuiltins}
-        exec 'x = str(1)' in d
+        exec('x = str(1)', d)
         self.assertEqual(d['x'], '1')
 
     def test_immutable(self):
@@ -149,12 +152,12 @@ class Test_Compiled(unittest.TestCase):
         f = StringIO.StringIO()
         code = rcompile.compile(
             "print >> f, 'hi',\nprint >> f, 'world'", '', 'exec')
-        exec code in {'f': f}
+        exec(code, {'f': f})
         self.assertEqual(f.getvalue(), 'hi world\n')
 
     def test_CompiledCode_default_output(self):
         def _exec(code, locals):
-            exec code in locals
+            exec(code, locals)
         code = rcompile.compile("print 'hi',\nprint 'world'", '', 'exec')
         self.assertRaises(NameError, _exec, code, {})
         import StringIO
