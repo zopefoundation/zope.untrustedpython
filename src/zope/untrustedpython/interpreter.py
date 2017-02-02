@@ -13,10 +13,17 @@
 ##############################################################################
 """Restricted interpreter.
 
-TODO: This code needs a serious security review!!!
 """
+# TODO: This code needs a serious security review!!!
+
+from RestrictedPython import compile_restricted
 from zope.untrustedpython.builtins import SafeBuiltins
-from zope.untrustedpython.rcompile import compile
+from zope.untrustedpython.transformer import UntrustedPythonNodeTransformer
+
+
+def compile(source, filename, mode):
+    return compile_restricted(source, filename, mode,
+                              policy=UntrustedPythonNodeTransformer)
 
 
 def exec_code(code, globals, locals=None):

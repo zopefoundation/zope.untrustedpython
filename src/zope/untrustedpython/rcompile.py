@@ -16,10 +16,10 @@
 Only 'eval' is supported at this time.
 """
 
-import compiler.pycodegen
-
-import RestrictedPython.RCompile
 from RestrictedPython.SelectCompiler import ast
+
+import compiler.pycodegen
+import RestrictedPython.RCompile
 
 
 def compile(source, filename, mode):

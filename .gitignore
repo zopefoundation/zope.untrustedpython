@@ -1,6 +1,7 @@
-*.pyc
+*.py[cod]
 *.so
 __pycache__
+.python-version
 *.egg
 *.egg-info
 build
@@ -15,3 +16,6 @@ parts
 nosetests.xml
 coverage.xml
 coverage
+.coverage*
+.cache/
+htmlcov/

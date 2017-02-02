@@ -2,11 +2,15 @@
 CHANGES
 =======
 
-4.0.1 (unreleased)
+5.0.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Changed Implementation corresponding to RestrictedPython 4
+  Using a NodeTransformer instead of a MutatingWalker
+  [loechel]
 
+- Python 3 compatibility
+  [loechel]
 
 4.0.0 (2013-02-12)
 ------------------
