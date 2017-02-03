@@ -1,8 +1,11 @@
-
 from zope.untrustedpython import interpreter
 from zope.untrustedpython.interpreter import compile
 
 import pytest
+import sys
+
+_version = sys.version_info
+IS_PY2 = _version.major == 2
 
 
 def test_CompiledProgram_simple():
@@ -12,6 +15,9 @@ def test_CompiledProgram_simple():
     assert d['x'] == 2
 
 
+@pytest.mark.skipif(
+    IS_PY2,
+    reason='print statement no longer exists in Python 3')
 def test_CompiledProgram_output_capturing():
     p = interpreter.CompiledProgram('print "Hello world!"')
     import StringIO
@@ -29,12 +35,15 @@ def test_CompiledExpression_simple():
 def test_CompiledCode_simple():
     code = compile("21 * 2", "<string>", "eval")
     assert eval(code) == 42
+
+
+def test_InvalidCode_input():
     with pytest.raises(TypeError):
         compile(object(), '<string>', 'eval')
 
 
 def test_CompiledCode_statements():
-    exec compile("x = 1", "<string>", "exec")
+    exec(compile("x = 1", "<string>", "exec"), globals(), locals())
     assert x == 1
 
 
@@ -47,6 +56,9 @@ def test_CompiledCode_no_exec():
         compile("try: pass\nexcept: pass", "<string>", "exec")
 
 
+@pytest.mark.skipif(
+    IS_PY2,
+    reason='print statement no longer exists in Python 3')
 def test_CompiledCode_explicit_writable():
     import StringIO
     f = StringIO.StringIO()
@@ -55,6 +67,9 @@ def test_CompiledCode_explicit_writable():
     assert f.getvalue() == 'hi world\n'
 
 
+@pytest.mark.skipif(
+    IS_PY2,
+    reason='print statement no longer exists in Python 3')
 def test_CompiledCode_default_output():
     def _exec(code, locals):
         exec(code, locals)

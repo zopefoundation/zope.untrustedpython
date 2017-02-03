@@ -30,6 +30,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
+
 setup(name='zope.untrustedpython',
       version='5.0.0.dev0',
       author='Zope Foundation and Contributors',
@@ -40,8 +41,8 @@ setup(name='zope.untrustedpython',
           + '\n\n' +
           read('CHANGES.rst')
       ),
-      keywords = "zope untrusted python",
-      classifiers = [
+      keywords="zope untrusted python",
+      classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Web Environment',
           'Intended Audience :: Developers',
@@ -62,7 +63,7 @@ setup(name='zope.untrustedpython',
       url='http://github.com/zopefoundation/zope.untrustedpython',
       license='ZPL 2.1',
       packages=find_packages('src'),
-      package_dir = {'': 'src'},
+      package_dir={'': 'src'},
       namespace_packages=['zope'],
       install_requires=[
           'setuptools',
@@ -84,6 +85,6 @@ setup(name='zope.untrustedpython',
               'isort',
           ],
       },
-      include_package_data = True,
-      zip_safe = True,
+      include_package_data=True,
+      zip_safe=True,
       )

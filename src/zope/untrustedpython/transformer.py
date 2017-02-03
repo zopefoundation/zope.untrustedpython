@@ -29,7 +29,8 @@ class UntrustedPythonNodeTransformer(RestrictingNodeTransformer):
         Also prevents augmented assignment of attributes, which would
         be difficult to support correctly.
         """
-        #return ast.CallFunc(_getattr_name,
+        # TODO: Implement
+        # return ast.CallFunc(_getattr_name,
         #                    [node.expr, ast.Const(node.attrname)])
 
     def visit_Print(self, node):
@@ -38,9 +39,14 @@ class UntrustedPythonNodeTransformer(RestrictingNodeTransformer):
         If we get a print without a destination, make the default destination
         untrusted_output.
         """
+        # TODO: Implement it save, based on PrintCollector
         if node.dest is None:
-            node.dest = ast.Name('untrusted_output', None, lineno=node.lineno)
+            node.dest = ast.Name('untrusted_output',
+                                 ast.Load(),
+                                 lineno=node.lineno)
         return self.node_contents_visit(node)
+
+    # TODO: Implement equivalent for print function
 
     def visit_Exec(self, node):
         self.not_allowed(node)

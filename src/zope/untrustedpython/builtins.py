@@ -13,17 +13,23 @@
 ##############################################################################
 """Protection of builtin objects.
 """
+
+from RestrictedPython._compat import IS_PY2
+from RestrictedPython._compat import IS_PY3
+from sys import modules
+from types import ModuleType
+from zope.security.checker import NamesChecker
 from zope.security.proxy import ProxyFactory
 
-import new
+if IS_PY2:
+    import __builtin__ as builtins
+elif IS_PY3:
+    import builtins
 
 
 def SafeBuiltins():
 
-    builtins = {}
-
-    from zope.security.checker import NamesChecker
-    import __builtin__
+    safe_builtins = {}
 
     _builtinTypeChecker = NamesChecker(
         ['__str__', '__repr__', '__name__', '__module__',
@@ -66,7 +72,7 @@ def SafeBuiltins():
     ]:
 
         try:
-            value = getattr(__builtin__, name)
+            value = getattr(builtins, name)
         except AttributeError:
             pass
         else:
@@ -74,9 +80,7 @@ def SafeBuiltins():
                 value = ProxyFactory(value, _builtinTypeChecker)
             else:
                 value = ProxyFactory(value)
-            builtins[name] = value
-
-    from sys import modules
+            safe_builtins[name] = value
 
     def _imp(name, fromlist, prefix=''):
         module = modules.get(prefix + name)
@@ -107,14 +111,14 @@ def SafeBuiltins():
 
         raise ImportError(name)
 
-    builtins['__import__'] = ProxyFactory(__import__)
+    safe_builtins['__import__'] = ProxyFactory(__import__)
 
-    return builtins
+    return safe_builtins
 
 
-class ImmutableModule(new.module):
+class ImmutableModule(ModuleType):
     def __init__(self, name='__builtins__', **kw):
-        new.module.__init__(self, name)
+        super(ImmutableModule, self).__init__(name)
         self.__dict__.update(kw)
 
     def __setattr__(self, name, v):
