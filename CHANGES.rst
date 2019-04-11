@@ -2,10 +2,10 @@
 CHANGES
 =======
 
-4.0.1 (unreleased)
+5.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Drop support for Python 2.6.
 
 
 4.0.0 (2013-02-12)
