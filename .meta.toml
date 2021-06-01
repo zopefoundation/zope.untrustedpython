@@ -15,4 +15,4 @@ with-sphinx-doctests = true
 use-flake8 = true
 
 [coverage]
-fail-under = 0
+fail-under = 98
