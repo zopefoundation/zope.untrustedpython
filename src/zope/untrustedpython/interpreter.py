@@ -18,9 +18,11 @@ TODO: This code needs a serious security review!!!
 from zope.untrustedpython.builtins import SafeBuiltins
 from zope.untrustedpython.rcompile import compile
 
+
 def exec_code(code, globals, locals=None):
     globals['__builtins__'] = SafeBuiltins
     exec code in globals, locals
+
 
 def exec_src(source, globals, locals=None):
     globals['__builtins__'] = SafeBuiltins
@@ -42,6 +44,7 @@ class CompiledExpression(object):
             return eval(self.code, globals)
         else:
             return eval(self.code, globals, locals)
+
 
 class CompiledProgram(object):
     """A compiled expression
