@@ -21,6 +21,7 @@ import compiler.pycodegen
 import RestrictedPython.RCompile
 from RestrictedPython.SelectCompiler import ast
 
+
 def compile(text, filename, mode):
     if not isinstance(text, basestring):
         raise TypeError("Compiled source must be string")
@@ -28,11 +29,12 @@ def compile(text, filename, mode):
     gen.compile()
     return gen.getCode()
 
+
 class RExpression(RestrictedPython.RCompile.RestrictedCompileMode):
 
     CodeGeneratorClass = compiler.pycodegen.ExpressionCodeGenerator
 
-    def __init__(self, source, filename, mode = "eval"):
+    def __init__(self, source, filename, mode="eval"):
         self.mode = mode
         RestrictedPython.RCompile.RestrictedCompileMode.__init__(
             self, source, filename)
@@ -86,10 +88,9 @@ class RestrictionMutator:
             node.dest = ast.Name('untrusted_output')
         return node
     visitPrintnl = visitPrint
-        
+
     def visitRaise(self, node, walker):
         self.error(node, "raise statements are not supported")
 
     def visitTryExcept(self, node, walker):
         self.error(node, "try/except statements are not supported")
-                   

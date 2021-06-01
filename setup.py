@@ -21,9 +21,10 @@
 import os
 from setuptools import find_packages, setup
 
-here = os.path.abspath(os.path.dirname(__file__))
+
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
 
 setup(name='zope.untrustedpython',
       version='5.0.dev0',
@@ -34,9 +35,9 @@ setup(name='zope.untrustedpython',
           read('README.rst')
           + '\n\n' +
           read('CHANGES.rst')
-          ),
-      keywords = "zope untrusted python",
-      classifiers = [
+      ),
+      keywords="zope untrusted python",
+      classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Web Environment',
           'Intended Audience :: Developers',
@@ -52,14 +53,16 @@ setup(name='zope.untrustedpython',
       url='http://github.com/zopefoundation/zope.untrustedpython',
       license='ZPL 2.1',
       packages=find_packages('src'),
-      package_dir = {'': 'src'},
+      package_dir={'': 'src'},
       namespace_packages=['zope'],
+      python_requires='< 3',
       install_requires=[
+          'RestrictedPython < 4',
           'setuptools',
-          'RestrictedPython',
+          'six',
           'zope.security',
-          ],
-      test_suite = 'zope.untrustedpython.tests.test_suite',
-      include_package_data = True,
-      zip_safe = True,
+      ],
+      test_suite='zope.untrustedpython.tests.test_suite',
+      include_package_data=True,
+      zip_safe=True,
       )

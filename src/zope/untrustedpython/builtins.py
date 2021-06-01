@@ -16,6 +16,7 @@
 from zope.security.proxy import ProxyFactory
 import new
 
+
 def SafeBuiltins():
 
     builtins = {}
@@ -60,8 +61,8 @@ def SafeBuiltins():
         # check in merge_class_dict in object.c. The assert macro
         # seems to be doing the wrong think. Basically, if an object
         # has bases, then bases is assumed to be a tuple.
-        #dir,
-        ]:
+        # dir,
+    ]:
 
         try:
             value = getattr(__builtin__, name)
@@ -77,11 +78,11 @@ def SafeBuiltins():
     from sys import modules
 
     def _imp(name, fromlist, prefix=''):
-        module = modules.get(prefix+name)
+        module = modules.get(prefix + name)
         if module is not None:
             if fromlist or ('.' not in name):
                 return module
-            return modules[prefix+name.split('.')[0]]
+            return modules[prefix + name.split('.')[0]]
 
     def __import__(name, globals=None, locals=None, fromlist=()):
         # Waaa, we have to emulate __import__'s weird semantics.
@@ -95,7 +96,7 @@ def SafeBuiltins():
                     # so remove last name segment:
                     __name__ = '.'.join(__name__.split('.')[:-1])
                 if __name__:
-                    module = _imp(name, fromlist, __name__+'.')
+                    module = _imp(name, fromlist, __name__ + '.')
                     if module is not None:
                         return module
 
@@ -108,6 +109,7 @@ def SafeBuiltins():
     builtins['__import__'] = ProxyFactory(__import__)
 
     return builtins
+
 
 class ImmutableModule(new.module):
     def __init__(self, name='__builtins__', **kw):

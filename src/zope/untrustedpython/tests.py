@@ -131,7 +131,7 @@ class Test_Compiled(unittest.TestCase):
 
     def test_CompiledCode_statements(self):
         exec rcompile.compile("x = 1", "<string>", "exec")
-        self.assertEqual(x, 1)
+        self.assertEqual(x, 1)  # noqa: F821 undefined name 'x'
 
     def test_CompiledCode_no_exec(self):
         self.assertRaises(
