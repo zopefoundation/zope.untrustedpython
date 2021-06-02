@@ -11,32 +11,30 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-"""Restricted interpreter.
-
-TODO: This code needs a serious security review!!!
-"""
+"""Restricted interpreter."""
+# TODO: This code needs a serious security review!!!
+from RestrictedPython.PrintCollector import PrintCollector
 from zope.untrustedpython.builtins import SafeBuiltins
-from zope.untrustedpython.rcompile import compile
+from zope.untrustedpython import rcompile
 
 
 def exec_code(code, globals, locals=None):
     globals['__builtins__'] = SafeBuiltins
-    exec code in globals, locals
+    globals['_getattr_'] = SafeBuiltins.getattr
+    exec(code, globals, locals)
 
 
 def exec_src(source, globals, locals=None):
-    globals['__builtins__'] = SafeBuiltins
-    code = compile(source, '<string>', 'exec')
-    exec code in globals, locals
+    code = rcompile.compile(source, '<string>', 'exec')
+    exec_code(code, globals, locals)
 
 
 class CompiledExpression(object):
-    """A compiled expression
-    """
+    """A compiled expression."""
 
     def __init__(self, source, filename='<string>'):
         self.source = source
-        self.code = compile(source, filename, 'eval')
+        self.code = rcompile.compile(source, filename, 'eval')
 
     def eval(self, globals, locals=None):
         globals['__builtins__'] = SafeBuiltins
@@ -47,15 +45,17 @@ class CompiledExpression(object):
 
 
 class CompiledProgram(object):
-    """A compiled expression
-    """
+    """A compiled program."""
 
     def __init__(self, source, filename='<string>'):
         self.source = source
-        self.code = compile(source, filename, 'exec')
+        self.code = rcompile.compile(source, filename, 'exec')
 
     def exec_(self, globals, locals=None, output=None):
         globals['__builtins__'] = SafeBuiltins
+        globals['_print_'] = PrintCollector
+        globals['_getattr_'] = SafeBuiltins.getattr
+
+        exec(self.code, globals, locals)
         if output is not None:
-            globals['untrusted_output'] = output
-        exec self.code in globals, locals
+            output.write(globals['_print']())

@@ -11,18 +11,22 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Tests for zope.security.checker
-"""
-import unittest
 from zope.untrustedpython import interpreter, rcompile
 from zope.untrustedpython.builtins import SafeBuiltins
+import six
+import unittest
+
+if six.PY2:
+    from StringIO import StringIO  # pragma: PY2
+else:
+    from io import StringIO  # pragma: PY3
 
 
 class Test_SafeBuiltins(unittest.TestCase):
 
     def test_simple(self):
         d = {'__builtins__': SafeBuiltins}
-        exec 'x = str(1)' in d
+        exec('x = str(1)', d)
         self.assertEqual(d['x'], '1')
 
     def test_immutable(self):
@@ -79,26 +83,34 @@ class Test_Interpreter(unittest.TestCase):
         self.assertEqual(type(d['str']), Proxy)
 
     def test_no_builtins_mutations(self):
-        from zope.security.interfaces import ForbiddenAttribute
         d = {}
         interpreter.exec_src("x=1", d)
-        self.assertRaises(
-            ForbiddenAttribute, interpreter.exec_src,
-            '__builtins__.__dict__["x"] = 1', d)
-        self.assertRaises(
-            ForbiddenAttribute, interpreter.exec_src,
-            'del __builtins__.__dict__["str"]', d)
-        self.assertRaises(
-            ForbiddenAttribute, interpreter.exec_src,
-            '__builtins__.__dict__.update({"x": 1})', d)
+        with self.assertRaises(SyntaxError) as err:
+            interpreter.exec_src('__builtins__.__dict__["x"] = 1', d)
+        self.assertIn('"__dict__" is an invalid attribute name',
+                      str(err.exception))
+        with self.assertRaises(SyntaxError) as err:
+            interpreter.exec_src('del __builtins__.__dict__["str"]', d)
+        self.assertIn('"__builtins__" is an invalid variable',
+                      str(err.exception))
+        with self.assertRaises(SyntaxError) as err:
+            interpreter.exec_src('__builtins__.__dict__.update({"x": 1})', d)
+        self.assertIn('"__builtins__" is an invalid variable',
+                      str(err.exception))
 
     def test_no_exec(self):
-        d = {}
-        self.assertRaises(SyntaxError, interpreter.exec_src, "exec 'x=1'", d)
+        with self.assertRaises(SyntaxError) as err:
+            interpreter.exec_src("exec('x=1')", {})
+        if six.PY2:
+            self.assertEqual("('Line 1: Exec statements are not allowed.',)",
+                             str(err.exception))  # pragma: PY2
+        else:
+            self.assertEqual("('Line 1: Exec calls are not allowed.',)",
+                             str(err.exception))  # pragma: PY3
 
     def test_exec_code(self):
         d = {}
-        code = compile('x=2', '<mycode>', 'exec')
+        code = rcompile.compile('x=2', '<mycode>', 'exec')
         interpreter.exec_code(code, d)
         self.assertEqual(d['x'], 2)
 
@@ -112,63 +124,55 @@ class Test_Compiled(unittest.TestCase):
         self.assertEqual(d['x'], 2)
 
     def test_CompiledProgram_output_capturing(self):
-        p = interpreter.CompiledProgram('print "Hello world!"')
-        import StringIO
-        f = StringIO.StringIO()
-        p.exec_({}, output=f)
+        # assignment to `res` is done to prevent a warning about not reading
+        # `printed` variable
+        p = interpreter.CompiledProgram('print("Hello world!"); res=printed')
+        globals = {}
+        f = StringIO()
+        p.exec_(globals, output=f)
         self.assertEqual(f.getvalue(), 'Hello world!\n')
 
     def test_CompiledExpression_simple(self):
-        p = interpreter.CompiledExpression('x*2')
+        p = interpreter.CompiledExpression('x * 2')
         self.assertEqual(p.eval({'x': 2}), 4)
         self.assertEqual(p.eval({}, {'x': 2}), 4)
 
     def test_CompiledCode_simple(self):
         code = rcompile.compile("21 * 2", "<string>", "eval")
         self.assertEqual(eval(code), 42)
-        self.assertRaises(
-            TypeError, rcompile.compile, object(), '<string>', 'eval')
+
+    def test_compile_invalid_code_type(self):
+        with self.assertRaises(TypeError):
+            rcompile.compile(object(), '<string>', 'eval')
 
     def test_CompiledCode_statements(self):
-        exec rcompile.compile("x = 1", "<string>", "exec")
+        exec(rcompile.compile("x = 1", "<string>", "exec"), globals())
+        # `exec` put `x` into the globals:
         self.assertEqual(x, 1)  # noqa: F821 undefined name 'x'
 
     def test_CompiledCode_no_exec(self):
-        self.assertRaises(
-            SyntaxError, rcompile.compile,
-            "exec 'x = 2'", "<string>", "exec")
-        self.assertRaises(
-            SyntaxError, rcompile.compile,
-            "raise KeyError('x')", "<string>", "exec")
-        self.assertRaises(
-            SyntaxError, rcompile.compile,
-            "try: pass\nexcept: pass", "<string>", "exec")
-
-    def test_CompiledCode_explicit_writable(self):
-        import StringIO
-        f = StringIO.StringIO()
-        code = rcompile.compile(
-            "print >> f, 'hi',\nprint >> f, 'world'", '', 'exec')
-        exec code in {'f': f}
-        self.assertEqual(f.getvalue(), 'hi world\n')
-
-    def test_CompiledCode_default_output(self):
-        def _exec(code, locals):
-            exec code in locals
-        code = rcompile.compile("print 'hi',\nprint 'world'", '', 'exec')
-        self.assertRaises(NameError, _exec, code, {})
-        import StringIO
-        f = StringIO.StringIO()
-        _exec(code, {'untrusted_output': f})
-        self.assertEqual(f.getvalue(), 'hi world\n')
-
-
-class Test_RestrictionMutator(unittest.TestCase):
-
-    def test_error_no_line_info(self):
-        rm = rcompile.RestrictionMutator()
-        rm.error(None, 'nothing')
-        self.assertEqual(rm.errors, ['nothing'])
+        with self.assertRaises(SyntaxError) as err:
+            rcompile.compile("exec('x = 2')", "<string>", "exec")
+        if six.PY2:
+            self.assertEqual("('Line 1: Exec statements are not allowed.',)",
+                             str(err.exception))  # pragma: PY2
+        else:
+            self.assertEqual("('Line 1: Exec calls are not allowed.',)",
+                             str(err.exception))  # pragma: PY3
+        with self.assertRaises(SyntaxError) as err:
+            rcompile.compile("raise KeyError('x')", "<string>", "exec")
+        self.assertEqual("('Line 1: Raise statements are not allowed.',)",
+                         str(err.exception))
+        with self.assertRaises(SyntaxError) as err:
+            rcompile.compile("try: pass\nexcept: pass", "<string>", "exec")
+        if six.PY2:
+            self.assertEqual(
+                "('Line 1: TryExcept statements are not allowed.',)",
+                str(err.exception))  # pragma: PY2
+        else:
+            self.assertEqual(
+                "('Line 1: Try statements are not allowed.',)",
+                str(err.exception))  # pragma: PY3
 
 
 def test_suite():
@@ -176,5 +180,4 @@ def test_suite():
         unittest.makeSuite(Test_SafeBuiltins),
         unittest.makeSuite(Test_Interpreter),
         unittest.makeSuite(Test_Compiled),
-        unittest.makeSuite(Test_RestrictionMutator),
     ))

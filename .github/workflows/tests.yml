@@ -18,10 +18,15 @@ jobs:
       matrix:
         config:
         # [Python version, tox env]
-        - ["2.7",   "lint"]
+        - ["3.8",   "lint"]
         - ["2.7",   "py27"]
-        - ["2.7",   "docs"]
-        - ["2.7",   "coverage"]
+        - ["3.5",   "py35"]
+        - ["3.6",   "py36"]
+        - ["3.7",   "py37"]
+        - ["3.8",   "py38"]
+        - ["3.9",   "py39"]
+        - ["3.8",   "docs"]
+        - ["3.8",   "coverage"]
 
     runs-on: ubuntu-latest
     name: ${{ matrix.config[1] }}
@@ -45,3 +50,10 @@ jobs:
         pip install tox
     - name: Test
       run: tox -e ${{ matrix.config[1] }}
+    - name: Coverage
+      if: matrix.config[1] == 'coverage'
+      run: |
+        pip install coveralls coverage-python-version
+        coveralls --service=github
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
