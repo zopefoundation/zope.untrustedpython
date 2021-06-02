@@ -368,7 +368,7 @@ All of the non-basic items in the safe builtins are proxied:
    >>> type(d['str']) is Proxy
    True
 
-Note that, while you cannot get access to the `__builtins__`:
+Note that you cannot get access to `__builtins__`:
 
 .. doctest::
 
