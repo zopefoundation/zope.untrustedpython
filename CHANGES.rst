@@ -16,7 +16,24 @@ Backwards incompatible changes
   ``.interpreter.CompiledProgram`` still supports output to a file like object
   by implementing accessing the printed data.
 
+- The following names are no longer available via ``__builtins__`` as they are
+  either potentially harmful, not accessible at all or meaningless:
+
+    + ``__debug__``
+    + ``__name__``
+    + ``__doc__``
+    + ``copyright``
+    + ``credits``
+    + ``license``
+    + ``quit``
+
 - Drop support for Python 2.6.
+
+Features
+++++++++
+
+- Add support for Python 3.5, 3.6, 3.7, 3.8 and 3.9.
+
 
 4.0.0 (2013-02-12)
 ------------------

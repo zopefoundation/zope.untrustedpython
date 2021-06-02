@@ -504,8 +504,10 @@ Using it is equally simple:
    42
 
 What's interesting about the restricted code is that all attribute
-lookups go through the ``_getattr_`` function.  This is generally
-provided as a built-in function in the restricted environment:
+lookups go through the ``_getattr_`` function. (This is not a typo, the name *
+actually single underscore getattr single underscore, see
+https://restrictedpython.readthedocs.io/en/latest/usage/policy.html?highlight=_getattr_#implementing-a-policy for details.)
+It is generally provided as a built-in function in the restricted environment:
 
 .. doctest::
 

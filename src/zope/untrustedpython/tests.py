@@ -137,6 +137,11 @@ class Test_Compiled(unittest.TestCase):
         self.assertEqual(p.eval({'x': 2}), 4)
         self.assertEqual(p.eval({}, {'x': 2}), 4)
 
+    def test_CompiledExpression_getattr(self):
+        p = interpreter.CompiledExpression('x.real')
+        self.assertEqual(p.eval({'x': 3 + 2j}), 3.0)
+        self.assertEqual(p.eval({}, {'x': 4 + 3j}), 4.0)
+
     def test_CompiledCode_simple(self):
         code = rcompile.compile("21 * 2", "<string>", "eval")
         self.assertEqual(eval(code), 42)
@@ -173,11 +178,3 @@ class Test_Compiled(unittest.TestCase):
             self.assertEqual(
                 "('Line 1: Try statements are not allowed.',)",
                 str(err.exception))  # pragma: PY3
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(Test_SafeBuiltins),
-        unittest.makeSuite(Test_Interpreter),
-        unittest.makeSuite(Test_Compiled),
-    ))

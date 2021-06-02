@@ -38,6 +38,7 @@ class CompiledExpression(object):
 
     def eval(self, globals, locals=None):
         globals['__builtins__'] = SafeBuiltins
+        globals['_getattr_'] = SafeBuiltins.getattr
         if locals is None:
             return eval(self.code, globals)
         else:
