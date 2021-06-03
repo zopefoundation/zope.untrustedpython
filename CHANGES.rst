@@ -27,6 +27,8 @@ Backwards incompatible changes
     + ``license``
     + ``quit``
 
+- Drop support to run the tests using ``python setup.py test``.
+
 - Drop support for Python 2.6.
 
 Features

@@ -68,7 +68,6 @@ setup(name='zope.untrustedpython',
           'six',
           'zope.security',
       ],
-      test_suite='zope.untrustedpython.tests.test_suite',
       include_package_data=True,
       zip_safe=True,
       )
