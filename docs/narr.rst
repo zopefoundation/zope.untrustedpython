@@ -121,8 +121,8 @@ invokes 2 operations:
   2. Use the low-level '__call__' operation on the result of the first
      operation.
 
-For all operations except the `__getattribute__` and
-`__setattribute__` operations, security proxies have a permission
+For all operations except the ``__getattribute__`` and
+``__setattribute__`` operations, security proxies have a permission
 value defined by the permission-declaration subsystem.  Two special
 permission values indicate that access is either forbidden (never
 allowed) or public (always allowed).  For all other permission values,
@@ -232,7 +232,7 @@ suitable module object:
 
    >>> from zope.untrustedpython.builtins import SafeBuiltins
    >>> d = {'__builtins__': SafeBuiltins}
-   >>> exec 'x = str(1)' in d
+   >>> exec('x = str(1)', d)
    >>> d['x']
    '1'
 
@@ -250,17 +250,6 @@ The object is immutable:
    ...
    TypeError: object does not support item deletion
 
-
-
-   Exception raised:
-   ...
-   TypeError: object does not support item deletion
-
-(Note that you can mutate it through its `__dict__` attribute,
- however, when combined with the untrusted code compiler, getting the
- `__dict__` attribute will return a proxied object that will prevent
- mutation.)
-
 It contains items with keys that are all strings and values that are
 either proxied or are basic types:
 
@@ -273,7 +262,7 @@ either proxied or are basic types:
    ...     if value is not None and not isinstance(value, (Proxy, int, str)):
    ...         raise TypeError(value, key)
 
-It doesn't contain unsafe items, such as eval, globals, etc:
+It doesn't contain unsafe items, such as eval, globals, quit, ...:
 
 .. doctest::
 
@@ -285,6 +274,10 @@ It doesn't contain unsafe items, such as eval, globals, etc:
    Traceback (most recent call last):
    ...
    AttributeError: 'ImmutableModule' object has no attribute 'globals'
+   >>> SafeBuiltins.quit
+   Traceback (most recent call last):
+   ...
+   AttributeError: 'ImmutableModule' object has no attribute 'quit'
 
 The safe builtins also contains a custom __import__ function.
 
@@ -375,34 +368,24 @@ All of the non-basic items in the safe builtins are proxied:
    >>> type(d['str']) is Proxy
    True
 
-Note that, while you can get to the safe `__builtins__`'s dictionary,
-you can't use the dictionary to mutate it:
+Note that you cannot get access to `__builtins__`:
 
 .. doctest::
 
-   >>> from zope.security.interfaces import ForbiddenAttribute
-
-   >>> try: exec_src('__builtins__.__dict__["x"] = 1', d)
-   ... except ForbiddenAttribute: print 'Forbidden!'
-   Forbidden!
-
-   >>> try: exec_src('del __builtins__.__dict__["str"]', d)
-   ... except ForbiddenAttribute: print 'Forbidden!'
-   Forbidden!
-
-   >>> try: exec_src('__builtins__.__dict__.update({"x": 1})', d)
-   ... except ForbiddenAttribute: print 'Forbidden!'
-   Forbidden!
+   >>> exec_src('__builtins__.__dict__["x"] = 1', d)
+   Traceback (most recent call last):
+   ...
+   SyntaxError: ('Line 1: "__dict__" is an invalid attribute name because it starts with "_".', 'Line 1: "__builtins__" is an invalid variable name because it starts with "_"')
 
 Because the untrusted code compiler is used, you can't use exec,
 raise, or try/except statements:
 
 .. doctest::
 
-   >>> exec_src("exec 'x=1'", d)
+   >>> exec_src("exec('x=1'"), d)
    Traceback (most recent call last):
    ...
-   SyntaxError: Line 1: exec statements are not supported
+   SyntaxError: Line 1: exec calls are not supported
 
 Any attribute-access results will be proxied:
 
@@ -429,13 +412,13 @@ You can compile code yourself and call exec_code instead:
    2
 
 This is useful if you are going to be executing the same expression
-many times, as you can avoid the cost of repeated comilation.
+many times, as you can avoid the cost of repeated compilation.
 
 Compiled Programs
 -----------------
 
 A slightly higher-level interface is provided by compiled programs.
-These make it easier to safetly safe the results of compilation:
+These make it easier to safely safe the results of compilation:
 
 .. doctest::
 
@@ -447,13 +430,14 @@ These make it easier to safetly safe the results of compilation:
    2
 
 When you execute a compiled program, you can supply an object with a
-write method to get print output:
+write method to get print output. (Assigning ``printed`` to ``res`` is only
+done to prevent a ``SyntaxWarning`` of ``RestrictedPython``.)
 
 .. doctest::
 
-   >>> p = CompiledProgram('print "Hello world!"')
-   >>> import cStringIO
-   >>> f = cStringIO.StringIO()
+   >>> p = CompiledProgram('print("Hello world!"); res=printed')
+   >>> import io
+   >>> f = io.StringIO()
    >>> p.exec_({}, output=f)
    >>> f.getvalue()
    'Hello world!\n'
@@ -462,7 +446,7 @@ write method to get print output:
 Compiled Expressions
 --------------------
 
-You can also precompile expressions:
+You can also pre-compile expressions:
 
 .. doctest::
 
@@ -491,7 +475,7 @@ needs to be done differently by the generated code is to:
   global, rather than having an implicit sys.output.
 
 - Prevent try/except and raise statements. This is mainly because they
-  don't work properly in the presense of security proxies.  Try/except
+  don't work properly in the presence of security proxies.  Try/except
   statements will be made to work in the future.
 
 No other special treatment is needed to support safe expression
@@ -499,7 +483,7 @@ evaluation.
 
 The implementation makes use of the `RestrictedPython` package,
 originally written for Zope 2.  There is a new AST re-writer in
-`zope.untrustedpython.rcompile` which performs the
+`zope.untrustedpython.transformer` which performs the
 tree-transformation, and a top-level `compile()` function in
 `zope.untrustedpython.rcompile`; the later is what client
 applications are expected to use.
@@ -520,30 +504,32 @@ Using it is equally simple:
    42
 
 What's interesting about the restricted code is that all attribute
-lookups go through the `getattr()` function.  This is generally
-provided as a built-in function in the restricted environment:
+lookups go through the ``_getattr_`` function. (This is not a typo, the name *
+actually single underscore getattr single underscore, see
+https://restrictedpython.readthedocs.io/en/latest/usage/policy.html?highlight=_getattr_#implementing-a-policy for details.)
+It is generally provided as a built-in function in the restricted environment:
 
 .. doctest::
 
    >>> def mygetattr(object, name, default="Yahoo!"):
    ...     marker = []
-   ...     print "Looking up", name
+   ...     print("Looking up", name)
    ...     if getattr(object, name, marker) is marker:
    ...         return default
    ...     else:
    ...         return "Yeehaw!"
 
-   >>> import __builtin__
-   >>> builtins = __builtin__.__dict__.copy()
-   >>> builtins["getattr"] = mygetattr
+   >>> import builtins
+   >>> builtins = builtins.__dict__.copy()
 
    >>> def reval(source):
    ...     code = compile(source, "README.txt", "eval")
-   ...     globals = {"__builtins__": builtins}
+   ...     globals = {"__builtins__": builtins,
+   ...                "_getattr_": mygetattr}
    ...     return eval(code, globals, {})
 
-   >>> reval("(42).__class__")
-   Looking up __class__
+   >>> reval("(42).real")
+   Looking up real
    'Yeehaw!'
    >>> reval("(42).not_really_there")
    Looking up not_really_there
@@ -560,16 +546,16 @@ To compile code with statements, use exec or single:
 
 .. doctest::
 
-   >>> exec compile("x = 1", "<string>", "exec")
+   >>> exec(compile("x = 1", "<string>", "exec"), globals())
    >>> x
    1
 
-Trying to compile exec, raise or try/except sattements gives
+Trying to compile exec, raise or try/except statements gives
 syntax errors:
 
 .. doctest::
 
-   >>> compile("exec 'x = 2'", "<string>", "exec")
+   >>> compile("exec('x = 2')", "<string>", "exec")
    Traceback (most recent call last):
    ...
    SyntaxError: Line 1: exec statements are not supported
@@ -583,28 +569,3 @@ syntax errors:
    Traceback (most recent call last):
    ...
    SyntaxError: Line 1: try/except statements are not supported
-
-Printing to an explicit writable is allowed:
-
-.. doctest::
-
-   >>> import StringIO
-   >>> f = StringIO.StringIO()
-   >>> code = compile("print >> f, 'hi',\nprint >> f, 'world'", '', 'exec')
-   >>> exec code in {'f': f}
-   >>> f.getvalue()
-   'hi world\n'
-
-But if no output is specified, then output will be send to
-`untrusted_output`:
-
-.. doctest::
-
-   >>> code = compile("print 'hi',\nprint 'world'", '', 'exec')
-   >>> exec code in {}
-   Traceback (most recent call last):
-   ...
-   NameError: name 'untrusted_output' is not defined
-
-   >>> f = StringIO.StringIO()
-   >>> exec code in {'untrusted_output': f}

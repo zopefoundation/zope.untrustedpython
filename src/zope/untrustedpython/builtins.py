@@ -11,26 +11,29 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-"""Protection of builtin objects.
+"""Protection of built-in objects.
 """
+from types import ModuleType
+from zope.security.checker import NamesChecker
 from zope.security.proxy import ProxyFactory
-import new
+import six
 
 
 def SafeBuiltins():
 
-    builtins = {}
+    safe_builtins = {}
 
-    from zope.security.checker import NamesChecker
-    import __builtin__
+    if six.PY2:
+        import __builtin__ as builtins  # pragma: PY2
+    else:
+        import builtins  # pragma: PY3
 
     _builtinTypeChecker = NamesChecker(
         ['__str__', '__repr__', '__name__', '__module__',
          '__bases__', '__call__'])
 
     # It's better to say what is safe than it say what is not safe
-    for name in [
-
+    safe_names = [
         # Names of safe objects. See untrustedinterpreter.txt for a
         # definition of safe objects.
 
@@ -45,16 +48,16 @@ def SafeBuiltins():
         'SystemExit', 'TabError', 'TypeError', 'UnboundLocalError',
         'UnicodeError', 'UserWarning', 'ValueError', 'Warning',
         'ZeroDivisionError',
-        '__debug__', '__name__', '__doc__', 'abs', 'apply', 'bool',
-        'buffer', 'callable', 'chr', 'classmethod', 'cmp', 'coerce',
-        'complex', 'copyright', 'credits', 'delattr',
+        'abs', 'bool',
+        'callable', 'chr', 'classmethod', 'cmp', 'coerce',
+        'complex', 'delattr',
         'dict', 'divmod', 'filter', 'float', 'frozenset', 'getattr',
         'hasattr', 'hash', 'hex', 'id', 'int', 'isinstance',
-        'issubclass', 'iter', 'len', 'license', 'list',
+        'issubclass', 'iter', 'len', 'list',
         'long', 'map', 'max', 'min', 'object', 'oct', 'ord', 'pow',
-        'property', 'quit', 'range', 'reduce', 'repr', 'reversed', 'round',
+        'property', 'range', 'reduce', 'repr', 'reversed', 'round',
         'set', 'setattr', 'slice', 'sorted', 'staticmethod', 'str', 'super',
-        'tuple', 'type', 'unichr', 'unicode', 'vars', 'xrange', 'zip',
+        'tuple', 'type', 'unichr', 'unicode', 'vars', 'zip',
         'True', 'False',
 
         # TODO: dir segfaults with a seg fault due to a bad tuple
@@ -62,10 +65,18 @@ def SafeBuiltins():
         # seems to be doing the wrong think. Basically, if an object
         # has bases, then bases is assumed to be a tuple.
         # dir,
-    ]:
+    ]
 
+    if six.PY2:
+        safe_names.extend([
+            'apply',
+            'buffer',
+            'xrange',
+        ])  # pragma: PY2
+
+    for name in safe_names:
         try:
-            value = getattr(__builtin__, name)
+            value = getattr(builtins, name)
         except AttributeError:
             pass
         else:
@@ -73,7 +84,7 @@ def SafeBuiltins():
                 value = ProxyFactory(value, _builtinTypeChecker)
             else:
                 value = ProxyFactory(value)
-            builtins[name] = value
+            safe_builtins[name] = value
 
     from sys import modules
 
@@ -106,14 +117,14 @@ def SafeBuiltins():
 
         raise ImportError(name)
 
-    builtins['__import__'] = ProxyFactory(__import__)
+    safe_builtins['__import__'] = ProxyFactory(__import__)
 
-    return builtins
+    return safe_builtins
 
 
-class ImmutableModule(new.module):
+class ImmutableModule(ModuleType):
     def __init__(self, name='__builtins__', **kw):
-        new.module.__init__(self, name)
+        ModuleType.__init__(self, name)
         self.__dict__.update(kw)
 
     def __setattr__(self, name, v):
