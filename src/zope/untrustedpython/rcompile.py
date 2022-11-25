@@ -13,6 +13,7 @@
 ##############################################################################
 """compile() equivalent that produces restricted code."""
 from RestrictedPython import compile_restricted
+
 from zope.untrustedpython.transformer import UntrustedPythonNodeTransformer
 
 

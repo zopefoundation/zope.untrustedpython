@@ -11,10 +11,14 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from zope.untrustedpython import interpreter, rcompile
-from zope.untrustedpython.builtins import SafeBuiltins
-import six
 import unittest
+
+import six
+
+from zope.untrustedpython import interpreter
+from zope.untrustedpython import rcompile
+from zope.untrustedpython.builtins import SafeBuiltins
+
 
 if six.PY2:
     from StringIO import StringIO  # pragma: PY2
