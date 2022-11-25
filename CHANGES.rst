@@ -34,7 +34,7 @@ Backwards incompatible changes
 Features
 ++++++++
 
-- Add support for Python 3.5, 3.6, 3.7, 3.8 and 3.9.
+- Add support for Python 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11.
 
 
 4.0.0 (2013-02-12)

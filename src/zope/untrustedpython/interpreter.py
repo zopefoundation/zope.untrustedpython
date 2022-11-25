@@ -14,8 +14,9 @@
 """Restricted interpreter."""
 # TODO: This code needs a serious security review!!!
 from RestrictedPython.PrintCollector import PrintCollector
-from zope.untrustedpython.builtins import SafeBuiltins
+
 from zope.untrustedpython import rcompile
+from zope.untrustedpython.builtins import SafeBuiltins
 
 
 def exec_code(code, globals, locals=None):

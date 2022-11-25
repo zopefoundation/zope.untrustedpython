@@ -14,9 +14,11 @@
 """Protection of built-in objects.
 """
 from types import ModuleType
+
+import six
+
 from zope.security.checker import NamesChecker
 from zope.security.proxy import ProxyFactory
-import six
 
 
 def SafeBuiltins():
