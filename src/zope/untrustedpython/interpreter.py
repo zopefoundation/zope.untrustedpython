@@ -30,7 +30,7 @@ def exec_src(source, globals, locals=None):
     exec_code(code, globals, locals)
 
 
-class CompiledExpression(object):
+class CompiledExpression:
     """A compiled expression."""
 
     def __init__(self, source, filename='<string>'):
@@ -46,7 +46,7 @@ class CompiledExpression(object):
             return eval(self.code, globals, locals)
 
 
-class CompiledProgram(object):
+class CompiledProgram:
     """A compiled program."""
 
     def __init__(self, source, filename='<string>'):

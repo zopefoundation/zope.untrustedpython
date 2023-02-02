@@ -12,18 +12,11 @@
 #
 ##############################################################################
 import unittest
-
-import six
+from io import StringIO
 
 from zope.untrustedpython import interpreter
 from zope.untrustedpython import rcompile
 from zope.untrustedpython.builtins import SafeBuiltins
-
-
-if six.PY2:
-    from StringIO import StringIO  # pragma: PY2
-else:
-    from io import StringIO  # pragma: PY3
 
 
 class Test_SafeBuiltins(unittest.TestCase):
@@ -105,12 +98,8 @@ class Test_Interpreter(unittest.TestCase):
     def test_no_exec(self):
         with self.assertRaises(SyntaxError) as err:
             interpreter.exec_src("exec('x=1')", {})
-        if six.PY2:
-            self.assertEqual("('Line 1: Exec statements are not allowed.',)",
-                             str(err.exception))  # pragma: PY2
-        else:
-            self.assertEqual("('Line 1: Exec calls are not allowed.',)",
-                             str(err.exception))  # pragma: PY3
+        self.assertEqual("('Line 1: Exec calls are not allowed.',)",
+                         str(err.exception))
 
     def test_exec_code(self):
         d = {}
@@ -162,23 +151,14 @@ class Test_Compiled(unittest.TestCase):
     def test_CompiledCode_no_exec(self):
         with self.assertRaises(SyntaxError) as err:
             rcompile.compile("exec('x = 2')", "<string>", "exec")
-        if six.PY2:
-            self.assertEqual("('Line 1: Exec statements are not allowed.',)",
-                             str(err.exception))  # pragma: PY2
-        else:
-            self.assertEqual("('Line 1: Exec calls are not allowed.',)",
-                             str(err.exception))  # pragma: PY3
+        self.assertEqual("('Line 1: Exec calls are not allowed.',)",
+                         str(err.exception))
         with self.assertRaises(SyntaxError) as err:
             rcompile.compile("raise KeyError('x')", "<string>", "exec")
         self.assertEqual("('Line 1: Raise statements are not allowed.',)",
                          str(err.exception))
         with self.assertRaises(SyntaxError) as err:
             rcompile.compile("try: pass\nexcept: pass", "<string>", "exec")
-        if six.PY2:
-            self.assertEqual(
-                "('Line 1: TryExcept statements are not allowed.',)",
-                str(err.exception))  # pragma: PY2
-        else:
-            self.assertEqual(
-                "('Line 1: Try statements are not allowed.',)",
-                str(err.exception))  # pragma: PY3
+        self.assertEqual(
+            "('Line 1: Try statements are not allowed.',)",
+            str(err.exception))

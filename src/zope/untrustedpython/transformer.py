@@ -22,26 +22,9 @@ class UntrustedPythonNodeTransformer(RestrictingNodeTransformer):
     """
 
     def visit_Raise(self, node):
+        """Deny `raise`."""
         self.not_allowed(node)
 
     def visit_Try(self, node):
-        """Deny `try`.
-
-        This is Python 3 only, Python 2 uses TryExcept.
-        """
-        self.not_allowed(node)  # pragma: PY3
-
-    def visit_TryFinally(self, node):
-        """Deny `try .. finally`."""
-        self.not_allowed(node)  # pragma: PY2
-
-    def visit_ExceptHandler(self, node):
-        """Deny `except`."""
-        self.not_allowed(node)  # pragma: PY2
-
-    def visit_TryExcept(self, node):
-        """Deny `try ... except`.
-
-        This is Python 2 only, Python 3 uses visit_Try*.
-        """
-        self.not_allowed(node)  # pragma: PY2
+        """Deny `try`."""
+        self.not_allowed(node)

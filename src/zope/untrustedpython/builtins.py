@@ -15,8 +15,6 @@
 """
 from types import ModuleType
 
-import six
-
 from zope.security.checker import NamesChecker
 from zope.security.proxy import ProxyFactory
 
@@ -25,10 +23,7 @@ def SafeBuiltins():
 
     safe_builtins = {}
 
-    if six.PY2:
-        import __builtin__ as builtins  # pragma: PY2
-    else:
-        import builtins  # pragma: PY3
+    import builtins
 
     _builtinTypeChecker = NamesChecker(
         ['__str__', '__repr__', '__name__', '__module__',
@@ -68,13 +63,6 @@ def SafeBuiltins():
         # has bases, then bases is assumed to be a tuple.
         # dir,
     ]
-
-    if six.PY2:
-        safe_names.extend([
-            'apply',
-            'buffer',
-            'xrange',
-        ])  # pragma: PY2
 
     for name in safe_names:
         try:
