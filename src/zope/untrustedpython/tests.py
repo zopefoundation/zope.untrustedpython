@@ -22,6 +22,7 @@ from zope.untrustedpython.builtins import SafeBuiltins
 
 IS_PYPY = platform.python_implementation() == 'PyPy'
 
+
 class Test_SafeBuiltins(unittest.TestCase):
 
     def test_simple(self):
