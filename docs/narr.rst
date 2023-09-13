@@ -365,7 +365,10 @@ All of the non-basic items in the safe builtins are proxied:
 
    >>> exec_src('str=str', d)
    >>> from zope.security.proxy import Proxy
-   >>> type(d['str']) is Proxy
+   >>> import platform
+   >>> IS_PYPY = platform.python_implementation() == 'PyPy'
+   >>> # PyPy does not support proxies.
+   >>> True if IS_PYPY else type(d['str']) is Proxy
    True
 
 Note that you cannot get access to `__builtins__`:
