@@ -11,12 +11,16 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+import platform
 import unittest
 from io import StringIO
 
 from zope.untrustedpython import interpreter
 from zope.untrustedpython import rcompile
 from zope.untrustedpython.builtins import SafeBuiltins
+
+
+IS_PYPY = platform.python_implementation() == 'PyPy'
 
 
 class Test_SafeBuiltins(unittest.TestCase):
@@ -73,6 +77,7 @@ class Test_Interpreter(unittest.TestCase):
         self.assertEqual(d['x'], 1)
         self.assertEqual(d['__builtins__'], SafeBuiltins)
 
+    @unittest.skipIf(IS_PYPY, 'PyPy does not support proxies.')
     def test_proxied(self):
         d = {}
         interpreter.exec_src('str=str', d)

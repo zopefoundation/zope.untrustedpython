@@ -7,6 +7,9 @@ CHANGES
 
 - Drop support for Python 2.7, 3.5, 3.6.
 
+- Make sure the tests do not fail even on unsupported PyPy3 because ZTK might
+  run them.
+
 
 5.0 (2022-11-29)
 ----------------
