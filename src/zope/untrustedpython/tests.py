@@ -11,13 +11,14 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-import unittest
 import platform
+import unittest
 from io import StringIO
 
 from zope.untrustedpython import interpreter
 from zope.untrustedpython import rcompile
 from zope.untrustedpython.builtins import SafeBuiltins
+
 
 IS_PYPY = platform.python_implementation() == 'PyPy'
 
