@@ -170,9 +170,9 @@ Basic objects
 Basic objects are safe immutable objects that contain only immutable
 subobjects. Examples of basic objects include:
 
-- Strings,
+- Strings (bytes and Unicode),
 
-- Integers (long and normal),
+- Integers,
 
 - Floating-point objects,
 
