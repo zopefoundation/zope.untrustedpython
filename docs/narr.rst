@@ -172,7 +172,9 @@ subobjects. Examples of basic objects include:
 
 - Strings,
 
-- Integers (long and normal),
+- Bytes,
+
+- Integers,
 
 - Floating-point objects,
 

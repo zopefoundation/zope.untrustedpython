@@ -5,7 +5,8 @@ CHANGES
 6.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Update safe builtins for Python 3, adding ``bytes``, and removing ``cmp``,
+  ``coerce``, ``long``, ``reduce``, ``unichr``, and ``unicode``.
 
 
 6.0 (2023-09-13)

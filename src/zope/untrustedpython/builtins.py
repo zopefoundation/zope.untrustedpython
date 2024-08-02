@@ -31,8 +31,8 @@ def SafeBuiltins():
 
     # It's better to say what is safe than it say what is not safe
     safe_names = [
-        # Names of safe objects. See untrustedinterpreter.txt for a
-        # definition of safe objects.
+        # Names of safe objects. See docs/narr.rst for a definition of safe
+        # objects.
 
         'ArithmeticError', 'AssertionError', 'AttributeError',
         'DeprecationWarning', 'EOFError', 'Ellipsis', 'EnvironmentError',
@@ -45,16 +45,16 @@ def SafeBuiltins():
         'SystemExit', 'TabError', 'TypeError', 'UnboundLocalError',
         'UnicodeError', 'UserWarning', 'ValueError', 'Warning',
         'ZeroDivisionError',
-        'abs', 'bool',
-        'callable', 'chr', 'classmethod', 'cmp', 'coerce',
+        'abs', 'bool', 'bytes',
+        'callable', 'chr', 'classmethod',
         'complex', 'delattr',
         'dict', 'divmod', 'filter', 'float', 'frozenset', 'getattr',
         'hasattr', 'hash', 'hex', 'id', 'int', 'isinstance',
         'issubclass', 'iter', 'len', 'list',
-        'long', 'map', 'max', 'min', 'object', 'oct', 'ord', 'pow',
-        'property', 'range', 'reduce', 'repr', 'reversed', 'round',
+        'map', 'max', 'min', 'object', 'oct', 'ord', 'pow',
+        'property', 'range', 'repr', 'reversed', 'round',
         'set', 'setattr', 'slice', 'sorted', 'staticmethod', 'str', 'super',
-        'tuple', 'type', 'unichr', 'unicode', 'vars', 'zip',
+        'tuple', 'type', 'vars', 'zip',
         'True', 'False',
 
         # TODO: dir segfaults with a seg fault due to a bad tuple
