@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-6.1 (unreleased)
+6.1 (2024-08-02)
 ----------------
 
 - Update safe builtins for Python 3, adding ``bytes``, and removing ``cmp``,
