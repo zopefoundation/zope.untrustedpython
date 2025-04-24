@@ -5,7 +5,9 @@ CHANGES
 6.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add support for Python 3.12, 3.13.
+
+- Drop support for Python 3.7, 3.8.
 
 
 6.1 (2024-08-02)
