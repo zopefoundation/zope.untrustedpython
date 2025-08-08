@@ -20,7 +20,6 @@
 """
 import os
 
-from setuptools import find_packages
 from setuptools import setup
 
 
@@ -59,9 +58,6 @@ setup(name='zope.untrustedpython',
       ],
       url='http://github.com/zopefoundation/zope.untrustedpython',
       license='ZPL-2.1',
-      packages=find_packages('src'),
-      package_dir={'': 'src'},
-      namespace_packages=['zope'],
       python_requires='>=3.9',
       install_requires=[
           'RestrictedPython >= 4',
