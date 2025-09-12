@@ -28,7 +28,7 @@ def read(*rnames):
 
 
 setup(name='zope.untrustedpython',
-      version='7.0.dev0',
+      version='7.0',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.dev',
       description='Zope Untrusted Python Library',
