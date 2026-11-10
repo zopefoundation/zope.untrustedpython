@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zope.untrustedpython"
-version = "7.1"
+version = "7.2.dev0"
 description = "Zope Untrusted Python Library"
 license = "ZPL-2.1"
 classifiers = [
