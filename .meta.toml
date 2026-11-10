@@ -2,7 +2,7 @@
 # https://github.com/zopefoundation/meta/tree/master/src/zope/meta/pure-python
 [meta]
 template = "pure-python"
-commit-id = "f63da99d"
+commit-id = "48e61454"
 
 [python]
 with-pypy = false
@@ -21,3 +21,6 @@ testenv-skip-test-extra = true
 
 [coverage]
 fail-under = 98
+
+[pypi]
+trusted-publishing = true
